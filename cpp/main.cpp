@@ -52,15 +52,13 @@ class PoissonTrafficModel {
 
 			output_file << "time,size\n";
 
-			std::poisson_distribution<int> poisson_dist(duration / mean_interval);
-
-			float interval = duration / poisson_dist(gen);
-
 			std::exponential_distribution<float> exp_dist(1.0 / mean_package_size);
 
 			float current_time = 0.0;
 
 			while (current_time <= duration) {
+				std::poisson_distribution<int> poisson_dist((duration-current_time) / mean_interval);
+				float interval = duration / poisson_dist(gen);
 				output_file << current_time << "," << static_cast<int>(exp_dist(gen)) << "\n";
 				current_time += interval;
 			}

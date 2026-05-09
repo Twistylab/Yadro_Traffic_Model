@@ -123,6 +123,10 @@ int main(int argc, char* argv[]) {
 
 		PoissonTrafficModel(duration, mean_package_size, mean_interval).generate_csv();
 	}
+	else {
+		std::cout << "Uknown model name: " << model << std::endl;
+		return 1;
+	}
 
 	return 0;
 }

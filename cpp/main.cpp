@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <random>
+#include <filesystem>
 
 #include <string>
 
@@ -16,8 +17,8 @@ class EqualTrafficModel {
 			package_size = p;
 			interval = t;
 		};
-		void generate_csv() {
-			std::ofstream output_file("output.csv");
+		void generate_csv(std::filesystem::path path) {
+			std::ofstream output_file(path / "result/result_csv.csv");
 
 			output_file << "time,size\n";
 
@@ -47,8 +48,10 @@ class PoissonTrafficModel {
 			mean_interval = mt;
 			mean_package_size = mp;
 		};
-		void generate_csv() {
-			std::ofstream output_file("output.csv");
+		void generate_csv(std::filesystem::path path) {
+			std::ofstream output_file(path / "result/result_csv.csv");
+
+			std::cout << (path / "result/") << std::endl;
 
 			output_file << "time,size\n";
 
@@ -57,8 +60,12 @@ class PoissonTrafficModel {
 			float current_time = 0.0;
 
 			while (current_time <= duration) {
+				if (current_time == duration) {
+					output_file << current_time << "," << static_cast<int>(exp_dist(gen));
+					break;
+				}
 				std::poisson_distribution<int> poisson_dist((duration-current_time) / mean_interval);
-				float interval = duration / poisson_dist(gen);
+				float interval = (duration-current_time) / poisson_dist(gen);
 				output_file << current_time << "," << static_cast<int>(exp_dist(gen)) << "\n";
 				current_time += interval;
 			}
@@ -73,13 +80,15 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	std::cout << "Traffic model started" << std::endl;
+	std::string file_path = argv[1];
 
-	std::string path = argv[1];
+	std::filesystem::path path(argv[1]);
+
+	std::filesystem::path path_to_save = path.parent_path().parent_path();
 
 	std::cout << "Input file: " << path << std::endl;
 
-	std::ifstream input_file(path);
+	std::ifstream input_file(file_path);
 
 	std::string line1;
 	std::getline(input_file, line1);
@@ -111,7 +120,7 @@ int main(int argc, char* argv[]) {
 
 		params_stream >> package_size >> interval;
 
-		EqualTrafficModel(duration, package_size, interval).generate_csv();
+		EqualTrafficModel(duration, package_size, interval).generate_csv(path_to_save);
 	}
 	else if (model == "poisson") {
 		float mean_interval;
@@ -119,7 +128,7 @@ int main(int argc, char* argv[]) {
 
 		params_stream >> mean_package_size >> mean_interval;
 
-		PoissonTrafficModel(duration, mean_package_size, mean_interval).generate_csv();
+		PoissonTrafficModel(duration, mean_package_size, mean_interval).generate_csv(path_to_save);
 	}
 	else {
 		std::cout << "Unknown model name: " << model << std::endl;

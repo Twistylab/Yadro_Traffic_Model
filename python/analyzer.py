@@ -11,9 +11,9 @@ def traffic_model_analyzer(df):
 
     analysis_dict = dict()
 
-    analysis_dict["avg_package_size"] = df["size"].mean()
-    analysis_dict["avg_delay"] = df["delay"].mean()
-    analysis_dict["bitrate"] = df["size"].sum() / (df["time"].max() - df["time"].min())
+    analysis_dict["avg_package_size"] = round(df["size"].mean(), 2)
+    analysis_dict["avg_delay"] = round(df["delay"].mean(), 2)
+    analysis_dict["bitrate"] = round(df["size"].sum() / (df["time"].max() - df["time"].min()), 2)
 
     if round(df["delay"].diff().sum()) == 0:
         analysis_dict["model"] = "equal"

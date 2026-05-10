@@ -10,12 +10,12 @@ class EqualTrafficModel {
 	private:
 		float duration;
 		int package_size;
-		float interval;
+		float delay;
 	public:
-		EqualTrafficModel(float d, int p, float t) {
-			duration = d;
-			package_size = p;
-			interval = t;
+		EqualTrafficModel(float dur, int ps, float dl) {
+			duration = dur;
+			package_size = ps;
+			delay = dl;
 		};
 		void generate_csv(std::filesystem::path path) {
 			std::ofstream output_file(path / "result/result_csv.csv");
@@ -26,7 +26,7 @@ class EqualTrafficModel {
 
 			while (current_time <= duration) {
 				output_file << current_time << "," << package_size << "\n";
-				current_time += interval;
+				current_time += delay;
 			}
 
 			output_file.close();
@@ -37,15 +37,15 @@ class PoissonTrafficModel {
 	private:
 		float duration;
 		float avg_package_size;
-		float avg_interval;
+		float avg_delay;
 		std::mt19937 gen;
 	public:
-		PoissonTrafficModel(float dur, float avgps, float avgt) {
+		PoissonTrafficModel(float dur, float avgps, float avgd) {
 			std::random_device rd;
 			gen = std::mt19937(rd());
 
 			duration = dur;
-			avg_interval = avgt;
+			avg_delay = avgd;
 			avg_package_size = avgps;
 		};
 		void generate_csv(std::filesystem::path path) {
@@ -53,20 +53,14 @@ class PoissonTrafficModel {
 
 			output_file << "time,size\n";
 
-			std::exponential_distribution<float> exp_dist(1.0 / avg_package_size);
+			std::exponential_distribution<float> size_dist(1.0 / avg_package_size);
+			std::exponential_distribution<float> delay_dist(1.0 / avg_delay);
 
 			float current_time = 0.0;
 
 			while (current_time <= duration) {
-				if (duration == current_time) {
-					output_file << current_time << "," << static_cast<int>(exp_dist(gen));
-					break;
-				}
-
-				std::poisson_distribution<int> poisson_dist((duration-current_time) / avg_interval);
-				float interval = (duration-current_time) / poisson_dist(gen);
-				output_file << current_time << "," << static_cast<int>(exp_dist(gen)) << "\n";
-				current_time += interval;
+				output_file << current_time << "," << (int)size_dist(gen) + 1 << "\n";
+				current_time += delay_dist(gen);
 			}
 
 			output_file.close();
@@ -113,19 +107,37 @@ int main(int argc, char* argv[]) {
 
 	if (model == "equal") {
 		int package_size;
-		float interval;
+		float delay;
 
-		params_stream >> package_size >> interval;
+		params_stream >> package_size >> delay;
 
-		EqualTrafficModel(duration, package_size, interval).generate_csv(path_to_save);
+		if (delay <= 0.0) {
+			std::cout << "Delay must be more than 0.0" << std::endl;
+			return 1;
+		}
+		else if (package_size <= 0) {
+			std::cout << "Package size must be more than 0" << std::endl;
+			return 1;
+		}
+
+		EqualTrafficModel(duration, package_size, delay).generate_csv(path_to_save);
 	}
 	else if (model == "poisson") {
-		float avg_interval;
+		float avg_delay;
 		float avg_package_size;
 
-		params_stream >> avg_package_size >> avg_interval;
+		params_stream >> avg_package_size >> avg_delay;
 
-		PoissonTrafficModel(duration, avg_package_size, avg_interval).generate_csv(path_to_save);
+		if (avg_delay <= 0.0) {
+			std::cout << "Average delay must be more than 0.0" << std::endl;
+			return 1;
+		}
+		else if (avg_package_size <= 0.0) {
+			std::cout << "Average package size must be more than 0.0" << std::endl;
+			return 1;
+		}
+
+		PoissonTrafficModel(duration, avg_package_size, avg_delay).generate_csv(path_to_save);
 	}
 	else {
 		std::cout << "Unknown model name: " << model << std::endl;

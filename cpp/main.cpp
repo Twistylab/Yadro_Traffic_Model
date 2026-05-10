@@ -58,13 +58,13 @@ class PoissonTrafficModel {
 			float current_time = 0.0;
 
 			while (current_time <= duration) {
-				std::poisson_distribution<int> poisson_dist((duration-current_time) / avg_interval);
-				int package_number = poisson_dist(gen);
-				if (package_number == 0.0) {
+				if (duration == current_time) {
 					output_file << current_time << "," << static_cast<int>(exp_dist(gen));
 					break;
 				}
-				float interval = (duration-current_time) / package_number;
+
+				std::poisson_distribution<int> poisson_dist((duration-current_time) / avg_interval);
+				float interval = (duration-current_time) / poisson_dist(gen);
 				output_file << current_time << "," << static_cast<int>(exp_dist(gen)) << "\n";
 				current_time += interval;
 			}

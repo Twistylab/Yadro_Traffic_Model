@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/nikitazotov/yadro_traffic_model/cpp/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

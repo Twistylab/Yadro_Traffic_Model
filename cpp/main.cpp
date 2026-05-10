@@ -40,13 +40,13 @@ class PoissonTrafficModel {
 		float avg_interval;
 		std::mt19937 gen;
 	public:
-		PoissonTrafficModel(float dur, int avgps, float avgt) {
+		PoissonTrafficModel(float dur, float avgps, float avgt) {
 			std::random_device rd;
 			gen = std::mt19937(rd());
 
 			duration = dur;
-			avg_interval = avgps;
-			avg_package_size = avgt;
+			avg_interval = avgt;
+			avg_package_size = avgps;
 		};
 		void generate_csv(std::filesystem::path path) {
 			std::ofstream output_file(path / "result/result_csv.csv");

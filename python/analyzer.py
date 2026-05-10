@@ -1,5 +1,6 @@
 import os
 import sys
+import math
 import json
 
 import matplotlib.pyplot as plt
@@ -7,34 +8,42 @@ import pandas as pd
 
 
 def traffic_model_analyzer(df):
-    df["delay"] = df["time"].diff()
+    df["delay"] = df["time"].diff() if len(df["time"]) > 1 else 0
 
     analysis_dict = dict()
 
     analysis_dict["avg_package_size"] = round(df["size"].mean(), 2)
     analysis_dict["avg_delay"] = round(df["delay"].mean(), 2)
-    analysis_dict["bitrate"] = round(df["size"].sum() / (df["time"].max() - df["time"].min()), 2)
-
-    if round(df["delay"].diff().sum()) == 0:
-        analysis_dict["model"] = "equal"
-    else:
-        analysis_dict["model"] = "poisson"
 
     fig = plt.figure(figsize=(12, 10))
 
+    bins = max(1, int(math.sqrt(len(df["time"]))))
+
     ax1 = fig.add_subplot(2, 1, 1)
 
-    df['delay'].hist(bins=30)
+    df['delay'].hist(bins=bins)
     ax1.set_title('Гистограмма задержек между пакетами')
     ax1.set_xlabel('Задержка')
     ax1.set_ylabel('Частота')
 
     ax2 = fig.add_subplot(2, 1, 2)
 
-    df['size'].hist(bins=30)
+    df['size'].hist(bins=bins)
     ax2.set_title('Гистограмма размеров пакетов')
     ax2.set_xlabel('Размер')
     ax2.set_ylabel('Частота')
+
+    if df["time"].sum() == 0:
+        analysis_dict["model"] = "Model cannot be determined"
+	analysis_dict["avg_bitrate"] = 0
+	return fig, analysis_dict
+
+    analysis_dict["avg_bitrate"] = 8 * round(df["size"].sum() / (df["time"].max() - df["time"].min()), 2)
+
+    if round(df["delay"].diff().sum()) == 0:
+	analysis_dict["model"] = "equal"
+    else:
+	analysis_dict["model"] = "poisson"
 
     return fig, analysis_dict
 

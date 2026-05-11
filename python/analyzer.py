@@ -23,7 +23,7 @@ def traffic_model_analyzer(df):
 
     df["delay"].hist(bins=bins, ax=ax1)
     ax1.set_title('Гистограмма задержек между пакетами')
-    ax1.set_xlabel('Задержка, мс')
+    ax1.set_xlabel('Задержка, с')
     ax1.set_ylabel('Частота')
 
     ax2 = fig.add_subplot(2, 1, 2)

@@ -35,18 +35,17 @@ def traffic_model_analyzer(df):
 
     if df["time"].sum() == 0:
         analysis_dict["model"] = "Model cannot be determined"
-	analysis_dict["avg_bitrate"] = 0
-	return fig, analysis_dict
+        analysis_dict["avg_bitrate"] = 0
+        return fig, analysis_dict
 
     analysis_dict["avg_bitrate"] = 8 * round(df["size"].sum() / (df["time"].max() - df["time"].min()), 2)
 
     if round(df["delay"].diff().sum()) == 0:
-	analysis_dict["model"] = "equal"
+        analysis_dict["model"] = "equal"
     else:
-	analysis_dict["model"] = "poisson"
+        analysis_dict["model"] = "poisson"
 
     return fig, analysis_dict
-
 
 if __name__ == "__main__":
     path = sys.argv[1]

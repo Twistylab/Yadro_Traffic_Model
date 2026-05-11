@@ -81,6 +81,11 @@ int main(int argc, char* argv[]) {
 
 	std::ifstream input_file(file_path);
 
+	if (!input_file.is_open()) {
+		std::cerr << "Cannot open input file: " << file_path << std::endl;
+		return 1;
+	}
+
 	std::string line1;
 	std::getline(input_file, line1);
 	std::string line2;
@@ -93,7 +98,7 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 	else if (duration == 0.0) {
-		std::ofstream output_file(path_to_save / "output.csv");
+		std::ofstream output_file(path_to_save / "result/result_csv.csv");
 		output_file << "time,size\n0.0,0";
 		output_file.close();
 		return 0;

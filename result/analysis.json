@@ -1,6 +1,6 @@
 {
-    "avg_package_size": 3.61,
-    "avg_delay": 10.62,
-    "avg_bitrate": 2.88,
-    "model": "poisson"
+    "avg_package_size": 6.0,
+    "avg_delay": 13.04,
+    "avg_bitrate": 4.0,
+    "model": "equal"
 }

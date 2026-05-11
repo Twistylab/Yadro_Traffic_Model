@@ -59,5 +59,4 @@ if __name__ == "__main__":
 
     with open(os.path.join(result_dir, "analysis.json"), "w") as file:
         json.dump(analysis_result, file, indent=4)
-    plt.close()
 

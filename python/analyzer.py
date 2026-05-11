@@ -8,7 +8,7 @@ import pandas as pd
 
 
 def traffic_model_analyzer(df):
-    df["delay"] = df["time"].diff() if len(df["time"]) > 1 else 0
+    df["delay"] = df["time"].diff().round(2) if len(df["time"]) > 1 else 0
 
     analysis_dict = dict()
 
@@ -21,14 +21,14 @@ def traffic_model_analyzer(df):
 
     ax1 = fig.add_subplot(2, 1, 1)
 
-    df['delay'].hist(bins=bins)
+    df["delay"].hist(bins=bins, ax=ax1)
     ax1.set_title('Гистограмма задержек между пакетами')
     ax1.set_xlabel('Задержка')
     ax1.set_ylabel('Частота')
 
     ax2 = fig.add_subplot(2, 1, 2)
 
-    df['size'].hist(bins=bins)
+    df['size'].hist(bins=bins, ax=ax2)
     ax2.set_title('Гистограмма размеров пакетов')
     ax2.set_xlabel('Размер')
     ax2.set_ylabel('Частота')
